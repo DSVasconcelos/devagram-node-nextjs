@@ -15,7 +15,7 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "Danilo/*@tuf*ndu[Cndefinedefinedeste": ["./*"]
+      "@/": ["./src/"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
