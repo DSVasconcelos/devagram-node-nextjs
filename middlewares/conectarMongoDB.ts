@@ -10,12 +10,12 @@ export const conectarMongoDB = (handler : NextApiHandler) =>
       }
       
       const {DB_CONEXAO_STRING} = process.env;
-
+      
       if(!DB_CONEXAO_STRING){
         return res.status(500).json({ erro: 'ENV DE CONFIGURAÇÃO DO BANCO NÃO INFORMADO'});
       }
 
-      mongoose.connection.on('connection', () => console.log('Banco Conectado'));
+      mongoose.connection.on('connected', () => console.log('Banco Conectado'));
       mongoose.connection.on('error', error => console.log('Não Conectado'));
       await mongoose.connect(DB_CONEXAO_STRING);
       return handler(req, res);
