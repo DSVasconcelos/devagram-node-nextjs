@@ -14,7 +14,7 @@ export const validarTokenJWT = (handler: NextApiHandler) =>
       if(!req || !req.headers){ //verifica se o usuario enviou algum valor dentro do header
         return res.status(401).json({erro: 'Não foi possivel validar o token de acesso'});
       }
-      console.log("oi");
+      
       if(req.method !== 'OPTIONS'){ 
         const authorization = req.headers['authorization']; //obtem o valor do token que vem nos dados de header
         
