@@ -9,7 +9,6 @@ const FeedEndpoint = async(req: NextApiRequest, res: NextApiResponse<RespostaPad
   try {
     if(req.method === "GET"){   
       
-      
       if (req?.query?.id){
         const usuario = await UsuarioModel.findById(req?.query?.id);
         console.log(usuario);

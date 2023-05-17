@@ -24,11 +24,19 @@ const upload = multer({storage : storage});
 
 const uploadImagemCosmic = async(req : any) => {
   if(req?.file?.originalname){
+    if(!req?.file?.originalname.includes('.png') && 
+       !req?.file?.originalname.includes('.jpg')&&
+       !req?.file?.originalname.includes('.jpeg'))
+      {
+        throw new Error('Extensão dfa imagem invalida');
+      }
+
     const media_object = {
       originalname: req.file.originalname,
       buffer: req.file.buffer
     };
 
+    
     if(req.url && req.url.includes('publicacoes')){
       return await bucketPublicacoes.addMedia({media : media_object});
     }else{
