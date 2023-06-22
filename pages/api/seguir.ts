@@ -4,7 +4,6 @@ import { validarTokenJWT } from "../../middlewares/validarTokenJwt";
 import { conectarMongoDB } from "../../middlewares/conectarMongoDB";
 import { UsuarioModel } from "../../models/UsuarioModel";
 import { SeguidorModel } from "../../models/SeguidorModel";
-import usuario from "./usuario";
 
 const seguirEndpoint = async (req: NextApiRequest, res: NextApiResponse<RespostaPadraoMsg>) => {
   try {
@@ -47,8 +46,10 @@ const seguirEndpoint = async (req: NextApiRequest, res: NextApiResponse<Resposta
 
       return res.status(200).json({erro:"usuario Seguido com sucesso"});
     }
+  }
+  else{
       return res.status(405).json({erro:"metodo invalido"});
-    }
+  }
   } catch (e) {
     console.log(e);
     return res.status(500).json({erro:"erro ao seguir/deixar de seguir"});
