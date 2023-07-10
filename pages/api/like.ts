@@ -4,6 +4,7 @@ import { validarTokenJWT } from "../../middlewares/validarTokenJwt";
 import { conectarMongoDB } from "../../middlewares/conectarMongoDB";
 import { PublicacaoModel } from "../../models/PublicacaoModel";
 import { UsuarioModel } from "../../models/UsuarioModel";
+import { InteracaoModel } from "../../models/InteracaoModel";
 
 const likeEndPoint = async (req: NextApiRequest, res: NextApiResponse<RespostaPadraoMsg>) => {
   try {
@@ -31,8 +32,19 @@ const likeEndPoint = async (req: NextApiRequest, res: NextApiResponse<RespostaPa
       }else{ //se for maior que  -> curtiu
         publicacao.likes.push(usuario._id);
         await PublicacaoModel.findByIdAndUpdate({_id: publicacao._id}, publicacao);
+        
+      //incluir uma nova notificação
+        
+        const notificacao ={ //dados da nova notificação criada após uma nova curtida
+          idPublicacao:publicacao._id,
+          idUsuario: usuario._id,
+          data: new Date(),
+          visualizado: false,
+          tipo: "curtida"
+        }
+        await InteracaoModel.create(notificacao); //salva a nova notificação
+        
         return res.status(200).json({ msg:"Curtida com sucesso" });
-    
       }
     }
     return res.status(400).json({ erro:"Metodo Informado não é valido" });

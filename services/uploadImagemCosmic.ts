@@ -1,22 +1,11 @@
 import multer from "multer";
 import cosmicjs from "cosmicjs";
+import { createBucketClient } from "@cosmicjs/sdk";
 
-const{
-  CHAVE_GRAVACAO_AVATARES,
-  CHAVE_GRAVACAO_PUBLICACOES,
-  BUCKET_AVATARES,
-  BUCKET_PUBLICACOES
-} = process.env;
-
-const Cosmic = cosmicjs();
-const bucketAvatares = Cosmic.bucket({
-  slug:BUCKET_AVATARES, 
-  write_key:CHAVE_GRAVACAO_AVATARES
-});
-
-const bucketPublicacoes = Cosmic.bucket({
-  slug: BUCKET_PUBLICACOES, 
-  write_key: CHAVE_GRAVACAO_PUBLICACOES
+const bucketDevagram = createBucketClient({
+  bucketSlug: 'devagram-imagens',
+  readKey: '6anNZ80ttL6RhyVr4B8VsdutvV6TbprrkEzpZPeGcCyppCUXnK',
+  writeKey: 'Fq4N9xYvk7Xy2ZAl75JCw5T2Wdi1l8rKDcKscKN2w7Tfw4wUx2'
 });
 
 const storage = multer.memoryStorage();
@@ -28,21 +17,29 @@ const uploadImagemCosmic = async(req : any) => {
        !req?.file?.originalname.includes('.jpg')&&
        !req?.file?.originalname.includes('.jpeg'))
       {
-        throw new Error('Extensão dfa imagem invalida');
+        throw new Error('Extensão da imagem invalida');
       }
 
     const media_object = {
       originalname: req.file.originalname,
-      buffer: req.file.buffer
+      buffer: req.file.buffer,
     };
-
     
-    if(req.url && req.url.includes('publicacoes')){
-      return await bucketPublicacoes.addMedia({media : media_object});
+    if(req.url && req.url.includes('publicacao')){
+      console.log("nova publicacao");
+      return await bucketDevagram.media.insertOne({
+        media: media_object,
+        folder: 'publicacoes'
+      });
+     
     }else{
-      return await bucketAvatares.addMedia({media : media_object});
-    }
+      console.log("foto usuario");
+      return await bucketDevagram.media.insertOne({
+        media: media_object,
+        folder: 'avatares'
+    });
+   }
   }
 }
 
-export {upload, uploadImagemCosmic};
+export {upload, uploadImagemCosmic}

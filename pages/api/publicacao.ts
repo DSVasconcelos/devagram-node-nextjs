@@ -31,7 +31,8 @@ const handler = nc ()
     if (!req.file || !req.file.originalname){
         return res.status(400).json({erro : "imagem não é valida"});
     }
-
+    console.log(req.file.originalname);
+    
     const image = await uploadImagemCosmic(req);
     const publicacao = {
       idUsuario : usuario._id,
@@ -39,10 +40,10 @@ const handler = nc ()
       foto: image.media.url, 
       data: new Date()
     }
-
+  
     usuario.publicacoes++;
     await UsuarioModel.findByIdAndUpdate({_id : usuario._id}, usuario);
-
+    
     await PublicacaoModel.create(publicacao);
 
     return res.status(400).json({erro : "Publicação criada com sucesso"});

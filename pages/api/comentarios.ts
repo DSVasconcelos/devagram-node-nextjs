@@ -4,6 +4,7 @@ import { validarTokenJWT } from "../../middlewares/validarTokenJwt";
 import { conectarMongoDB } from "../../middlewares/conectarMongoDB";
 import { UsuarioModel } from "../../models/UsuarioModel";
 import { PublicacaoModel } from "../../models/PublicacaoModel";
+import { InteracaoModel } from "../../models/InteracaoModel";
 
 const comentarioEndpoint = async (req: NextApiRequest, res: NextApiResponse<RespostaPadraoMsg>) => {
   try {
@@ -32,6 +33,22 @@ const comentarioEndpoint = async (req: NextApiRequest, res: NextApiResponse<Resp
 
       publicacao.comentarios.push(comentario);
       await PublicacaoModel.findByIdAndUpdate({_id: publicacao._id}, publicacao);
+      
+      try {
+        const notificacao ={ //dados da nova notificação criada após o comentario ser salvo
+          idPublicacao:publicacao._id,
+          idUsuario: usuarioLogado.id,
+          data: new Date(),
+          visualizado: false,
+          tipo: "comentario"
+        }
+        await InteracaoModel.create(notificacao); //salva no banco a nova notificação
+        
+      } catch (e) {
+        console.log(e);
+        return res.status(500).json({erro: "Comentario salvo, mas não notificado"});  
+      }
+
       return res.status(200).json({msg: "Comentario adicionado com sucesso"});
     }
     
