@@ -11,6 +11,7 @@ const NotificacoesEndpoint = async (req: NextApiRequest, res: NextApiResponse<Re
 
     //validar metodo - GET
     if (req.method === "GET"){
+      
       //validar usuario logado
       const {userId} = req.query; //onde é definido userId ???????
       const usuarioLogado = await UsuarioModel.findById(userId);
@@ -18,30 +19,33 @@ const NotificacoesEndpoint = async (req: NextApiRequest, res: NextApiResponse<Re
       if (!usuarioLogado){
         return res.status(405).json({erro: "usuario logado não encontrado"});
       }
-
-      //const Notificacoes = await InteracaoModel.find({visualizado:'false'}).sort({data:-1});
       
-      const Publicacoes = await PublicacaoModel.find({idUsuario: usuarioLogado.id}); 
-      const PublicacoesUsuarioLogado = Publicacoes.map(p => p._id);
+      const Publicacoes = await PublicacaoModel.find({idUsuario: usuarioLogado.id}); //traz todas as publicacoes do usuario logado
+      const PublicacoesUsuarioLogado = Publicacoes.map(p => p._id);//pega somente id das publicacoes trazidas do usuario logado
       
       const NovasNotificacoes = await InteracaoModel.find({
-        $and : [
-            {visualizado:'false'},
-            {idPublicacao: PublicacoesUsuarioLogado}
+        $and : [                                            //filtros das novas notificacoes 
+            {visualizado:'false'},                         
+            {idPublicacao: PublicacoesUsuarioLogado} 
         ]
-      }).sort({data:-1});
+      }).sort({data:-1});                                  //ordenação dos resultados da busca pela data mais recente
 
-     const HistoricoNotificacoes = await InteracaoModel.find({
-        $and : [
+     const HistoricoNotificacoes = await InteracaoModel.find({ 
+        $and : [                                          //filtro das notificacoes já vistas
             {visualizado:'true'},
             {idPublicacao: PublicacoesUsuarioLogado}
         ]
       }).sort({data:-1});
 
-      return res.status(200).json(HistoricoNotificacoes);
+      return res.status(200).json(NovasNotificacoes);
     }
    
-    //trazer todas as INTERAÇÕES das PUBLICACÕES do USUARIO LOGADO que constem como NÃO visualizadas
+    /*
+      oq falta ? 
+      - entender como sempre trazer as notificacoes vistas e não vistas
+      - marcar as notificações novas como lidas após consulta.
+    */
+   
   } catch (e) {
     console.log(e);
     return res.status(500).json({erro: "Não foi possivel carregar notificações"});
