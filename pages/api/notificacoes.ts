@@ -20,31 +20,36 @@ const NotificacoesEndpoint = async (req: NextApiRequest, res: NextApiResponse<Re
         return res.status(405).json({erro: "usuario logado não encontrado"});
       }
       
-      const Publicacoes = await PublicacaoModel.find({idUsuario: usuarioLogado.id}); //traz todas as publicacoes do usuario logado
-      const PublicacoesUsuarioLogado = Publicacoes.map(p => p._id);//pega somente id das publicacoes trazidas do usuario logado
+      //obtem todas as publicacoes do usuario logado e mapea somente o id delas
+      const Publicacoes = await PublicacaoModel.find({idUsuario: usuarioLogado.id}); 
+      const PublicacoesUsuarioLogado = Publicacoes.map(p => p._id);
       
+      //filtra as notificacoes novas e ordena pela mais recente
       const NovasNotificacoes = await InteracaoModel.find({
-        $and : [                                            //filtros das novas notificacoes 
+        $and : [                                            
             {visualizado:'false'},                         
             {idPublicacao: PublicacoesUsuarioLogado} 
         ]
-      }).sort({data:-1});                                  //ordenação dos resultados da busca pela data mais recente
+      }).sort({data:-1});        
 
-     const HistoricoNotificacoes = await InteracaoModel.find({ 
+     //filtra e ordena as notificacoes que já foram vistas
+      const HistoricoNotificacoes = await InteracaoModel.find({ 
         $and : [                                          //filtro das notificacoes já vistas
             {visualizado:'true'},
             {idPublicacao: PublicacoesUsuarioLogado}
         ]
       }).sort({data:-1});
 
-      return res.status(200).json(NovasNotificacoes);
+      /*após a consulta ser feita as notificações novas são marcadas como visualizadas
+        na proxima consulta vão aparecer no historico de notificações ⬇⬇⬇⬇*/
+      
+      const filtro = {visualizado: 'false', idPublicacao:PublicacoesUsuarioLogado}
+      const novosValores = {$set:{visualizado: "true"}};
+      //"altera muitos" registros com base nos filtros e valores definidos acima
+      await InteracaoModel.updateMany(filtro, novosValores);
+
+      return res.status(200).json(HistoricoNotificacoes);
     }
-   
-    /*
-      oq falta ? 
-      - entender como sempre trazer as notificacoes vistas e não vistas
-      - marcar as notificações novas como lidas após consulta.
-    */
    
   } catch (e) {
     console.log(e);
