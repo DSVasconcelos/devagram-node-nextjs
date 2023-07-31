@@ -47,9 +47,9 @@ const seguirEndpoint = async (req: NextApiRequest, res: NextApiResponse<Resposta
       await UsuarioModel.findByIdAndUpdate({_id : usuarioASerSeguido._id}, usuarioASerSeguido);
 
       //adiciona notificação de um novo seguidor
-      
       const notificacao ={ 
-        idPublicacao: usuarioASerSeguido._id,
+        idPublicacao: null,
+        idUsuarioSeguido: usuarioASerSeguido._id,
         idUsuario: usuarioLogado._id,
         data: new Date(),
         visualizado: false,

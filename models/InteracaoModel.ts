@@ -1,7 +1,8 @@
 import mongoose, {Schema} from "mongoose"
 
 const InteracaoSchema = new Schema({
-  idPublicacao:  {type: String, required: true},
+  idPublicacao:  {type: String},
+  idUsuarioSeguido: {type: String},
   idUsuario: {type: String, required: true}, // que interagiu
   data: {type: Date, required: true},
   visualizado: {type: Boolean}, //true - false

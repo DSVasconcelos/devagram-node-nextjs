@@ -28,7 +28,7 @@ const NotificacoesEndpoint = async (req: NextApiRequest, res: NextApiResponse<Re
       const NovasNotificacoes = await InteracaoModel.find({                                          
         visualizado:'false',
         $or:[
-          {idPublicacao: usuarioLogado.id},
+          {idUsuarioSeguido: usuarioLogado.id},
           {idPublicacao: PublicacoesUsuarioLogado}
         ]
       }).sort({data:-1});        
@@ -37,8 +37,8 @@ const NotificacoesEndpoint = async (req: NextApiRequest, res: NextApiResponse<Re
       const HistoricoNotificacoes = await InteracaoModel.find({
         visualizado:'true',
         $or:[
-          {idPublicacao: PublicacoesUsuarioLogado},
-          {idPublicacao: usuarioLogado.id}
+          {idUsuarioSeguido: usuarioLogado.id},
+          {idPublicacao: PublicacoesUsuarioLogado}
         ]
       }).sort({data:-1});
 
@@ -47,7 +47,7 @@ const NotificacoesEndpoint = async (req: NextApiRequest, res: NextApiResponse<Re
       
       const filtro = { 
         visualizado: 'false', 
-        $or:[{idPublicacao: PublicacoesUsuarioLogado},{idPublicacao: usuarioLogado.id}]
+        $or:[{idPublicacao: PublicacoesUsuarioLogado},{idUsuarioSeguido: usuarioLogado.id}]
       };
       const novosValores = {$set:{visualizado: "true"}};
       //"altera muitos" registros com base nos filtros e valores definidos acima
