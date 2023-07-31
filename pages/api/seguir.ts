@@ -4,6 +4,8 @@ import { validarTokenJWT } from "../../middlewares/validarTokenJwt";
 import { conectarMongoDB } from "../../middlewares/conectarMongoDB";
 import { UsuarioModel } from "../../models/UsuarioModel";
 import { SeguidorModel } from "../../models/SeguidorModel";
+import { InteracaoModel } from "../../models/InteracaoModel";
+import usuario from "./usuario";
 
 const seguirEndpoint = async (req: NextApiRequest, res: NextApiResponse<RespostaPadraoMsg>) => {
   try {
@@ -43,6 +45,17 @@ const seguirEndpoint = async (req: NextApiRequest, res: NextApiResponse<Resposta
 
       usuarioASerSeguido.seguidores++;
       await UsuarioModel.findByIdAndUpdate({_id : usuarioASerSeguido._id}, usuarioASerSeguido);
+
+      //adiciona notificação de um novo seguidor
+      
+      const notificacao ={ 
+        idPublicacao: usuarioASerSeguido._id,
+        idUsuario: usuarioLogado._id,
+        data: new Date(),
+        visualizado: false,
+        tipo: "Novo Seguidor"
+      }
+      await InteracaoModel.create(notificacao);
 
       return res.status(200).json({erro:"usuario Seguido com sucesso"});
     }

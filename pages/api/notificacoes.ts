@@ -25,30 +25,35 @@ const NotificacoesEndpoint = async (req: NextApiRequest, res: NextApiResponse<Re
       const PublicacoesUsuarioLogado = Publicacoes.map(p => p._id);
       
       //filtra as notificacoes novas e ordena pela mais recente
-      const NovasNotificacoes = await InteracaoModel.find({
-        $and : [                                            
-            {visualizado:'false'},                         
-            {idPublicacao: PublicacoesUsuarioLogado} 
+      const NovasNotificacoes = await InteracaoModel.find({                                          
+        visualizado:'false',
+        $or:[
+          {idPublicacao: usuarioLogado.id},
+          {idPublicacao: PublicacoesUsuarioLogado}
         ]
       }).sort({data:-1});        
 
      //filtra e ordena as notificacoes que já foram vistas
-      const HistoricoNotificacoes = await InteracaoModel.find({ 
-        $and : [                                          //filtro das notificacoes já vistas
-            {visualizado:'true'},
-            {idPublicacao: PublicacoesUsuarioLogado}
+      const HistoricoNotificacoes = await InteracaoModel.find({
+        visualizado:'true',
+        $or:[
+          {idPublicacao: PublicacoesUsuarioLogado},
+          {idPublicacao: usuarioLogado.id}
         ]
       }).sort({data:-1});
 
       /*após a consulta ser feita as notificações novas são marcadas como visualizadas
         na proxima consulta vão aparecer no historico de notificações ⬇⬇⬇⬇*/
       
-      const filtro = {visualizado: 'false', idPublicacao:PublicacoesUsuarioLogado}
+      const filtro = { 
+        visualizado: 'false', 
+        $or:[{idPublicacao: PublicacoesUsuarioLogado},{idPublicacao: usuarioLogado.id}]
+      };
       const novosValores = {$set:{visualizado: "true"}};
       //"altera muitos" registros com base nos filtros e valores definidos acima
       await InteracaoModel.updateMany(filtro, novosValores);
 
-      return res.status(200).json(HistoricoNotificacoes);
+      return res.status(200).json({NovasNotificacoes, HistoricoNotificacoes});
     }
    
   } catch (e) {

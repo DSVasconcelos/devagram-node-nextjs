@@ -5,7 +5,7 @@ const InteracaoSchema = new Schema({
   idUsuario: {type: String, required: true}, // que interagiu
   data: {type: Date, required: true},
   visualizado: {type: Boolean}, //true - false
-  tipo: {type: String, required: true} // curtida ou comentario
+  tipo: {type: String, required: true} // curtida, comentario, novo seguidor
 });
 
 export const InteracaoModel= (mongoose.models.interacoes || mongoose.model('interacoes', InteracaoSchema))
